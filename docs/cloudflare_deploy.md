@@ -2,6 +2,13 @@
 
 This repo can run the dashboard locally and deploy it to Cloudflare Pages + Worker + KV.
 
+Current deployments:
+
+```text
+Dashboard: https://trader-agent.pages.dev/
+Worker API: https://trader-agent-api.minhaenl.workers.dev
+```
+
 ## Architecture
 
 ```text
@@ -74,6 +81,14 @@ npm run deploy:pages
 ```
 
 For same-origin dashboard API calls, route `/api/*` on the dashboard domain to the Worker, or set `window.TRADER_AGENT_API_BASE` before loading the dashboard.
+
+The current `public/live_dashboard.html` defaults to:
+
+```text
+https://trader-agent-api.minhaenl.workers.dev
+```
+
+Localhost still uses the local `/api/live-history` endpoint.
 
 ## Manual Snapshot
 

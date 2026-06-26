@@ -45,6 +45,13 @@ Deployment docs:
 docs/cloudflare_deploy.md
 ```
 
+Current deployments:
+
+```text
+Dashboard: https://trader-agent.pages.dev/
+Worker API: https://trader-agent-api.minhaenl.workers.dev
+```
+
 Main pieces:
 
 ```text

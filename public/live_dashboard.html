@@ -498,7 +498,9 @@
     Chart.defaults.borderColor = "#edf1f5";
 
     async function loadHistory() {
-      const apiBase = window.TRADER_AGENT_API_BASE || "";
+      const defaultApiBase = "https://trader-agent-api.minhaenl.workers.dev";
+      const isLocal = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+      const apiBase = window.TRADER_AGENT_API_BASE || (isLocal ? "" : defaultApiBase);
       const candidates = [
         `${apiBase}/api/live-history`,
         "live_account_history.json"
