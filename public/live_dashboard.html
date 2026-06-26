@@ -8,19 +8,19 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f4f6f8;
+      --bg: #f5f5f7;
       --panel: #ffffff;
-      --panel-soft: #f9fafb;
-      --ink: #18202a;
-      --muted: #697586;
-      --line: #dde3ea;
-      --line-soft: #edf1f5;
-      --accent: #176b87;
-      --accent-soft: #e6f4f7;
-      --gold: #9a6b00;
-      --green: #16845b;
-      --red: #c24135;
-      --shadow: 0 12px 28px rgba(20, 31, 45, 0.08);
+      --panel-soft: #fafafc;
+      --ink: #1d1d1f;
+      --muted: #7a7a7a;
+      --muted-strong: #333333;
+      --line: #e0e0e0;
+      --line-soft: #f0f0f0;
+      --accent: #0066cc;
+      --accent-focus: #0071e3;
+      --accent-on-dark: #2997ff;
+      --green: #157a4a;
+      --red: #ad2e24;
     }
 
     * {
@@ -31,21 +31,22 @@
       margin: 0;
       background: var(--bg);
       color: var(--ink);
-      font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font: 17px/1.47 "SF Pro Text", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: -0.374px;
     }
 
     main {
-      max-width: 1240px;
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 28px;
+      padding: 32px 24px 48px;
     }
 
     header {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 18px;
+      gap: 24px;
       align-items: end;
-      margin-bottom: 18px;
+      margin-bottom: 24px;
     }
 
     h1, h2, p {
@@ -54,31 +55,38 @@
     }
 
     h1 {
-      font-size: 26px;
+      font-family: "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 40px;
       line-height: 1.1;
+      font-weight: 600;
+      letter-spacing: 0;
     }
 
     h2 {
-      font-size: 15px;
-      font-weight: 750;
+      font-size: 17px;
+      line-height: 1.24;
+      font-weight: 600;
+      letter-spacing: -0.374px;
     }
 
     .subhead {
       color: var(--muted);
-      margin-top: 7px;
+      margin-top: 8px;
     }
 
     .status-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 11px;
+      padding: 8px 14px;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 999px;
-      box-shadow: var(--shadow);
       color: var(--muted);
       white-space: nowrap;
+      font-size: 14px;
+      line-height: 1.29;
+      letter-spacing: -0.224px;
     }
 
     .dot {
@@ -86,49 +94,50 @@
       height: 9px;
       border-radius: 50%;
       background: var(--green);
-      box-shadow: 0 0 0 4px rgba(22, 132, 91, 0.12);
     }
 
     .dot.closed {
       background: var(--red);
-      box-shadow: 0 0 0 4px rgba(194, 65, 53, 0.12);
     }
 
     .metrics {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 14px;
+      gap: 20px;
+      margin-bottom: 20px;
     }
 
     .metric {
       min-width: 0;
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: var(--shadow);
+      border-radius: 18px;
+      padding: 24px;
     }
 
     .metric-label {
       color: var(--muted);
-      font-size: 12px;
-      font-weight: 650;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: 14px;
+      line-height: 1.29;
+      font-weight: 600;
+      letter-spacing: -0.224px;
       margin-bottom: 8px;
     }
 
     .metric-value {
-      font-size: 26px;
-      line-height: 1.1;
-      font-weight: 780;
+      font-family: "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 34px;
+      line-height: 1.18;
+      font-weight: 600;
+      letter-spacing: -0.374px;
       white-space: nowrap;
     }
 
     .metric-note {
       color: var(--muted);
       font-size: 12px;
+      line-height: 1.3;
+      letter-spacing: -0.12px;
       margin-top: 8px;
       min-height: 17px;
     }
@@ -136,15 +145,14 @@
     .layout {
       display: grid;
       grid-template-columns: minmax(0, 1.7fr) minmax(360px, 0.9fr);
-      gap: 14px;
-      margin-bottom: 14px;
+      gap: 20px;
+      margin-bottom: 20px;
     }
 
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
+      border-radius: 18px;
       min-width: 0;
     }
 
@@ -153,23 +161,25 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 15px 16px 0;
+      padding: 24px 24px 0;
     }
 
     .panel-note {
       color: var(--muted);
       font-size: 12px;
+      line-height: 1.3;
+      letter-spacing: -0.12px;
       white-space: nowrap;
     }
 
     .chart-wrap {
       height: 330px;
-      padding: 12px 16px 16px;
+      padding: 12px 24px 24px;
     }
 
     .allocation-wrap {
       height: 330px;
-      padding: 12px 16px 16px;
+      padding: 12px 24px 24px;
     }
 
     .table-panel {
@@ -178,7 +188,7 @@
 
     .table-wrap {
       overflow: auto;
-      padding: 6px 0 2px;
+      padding: 8px 0 4px;
     }
 
     table {
@@ -187,7 +197,7 @@
     }
 
     th, td {
-      padding: 11px 16px;
+      padding: 13px 24px;
       border-top: 1px solid var(--line-soft);
       text-align: right;
       white-space: nowrap;
@@ -200,7 +210,9 @@
     th {
       color: var(--muted);
       font-size: 12px;
-      font-weight: 700;
+      line-height: 1.3;
+      font-weight: 400;
+      letter-spacing: -0.12px;
       background: var(--panel-soft);
     }
 
@@ -219,31 +231,37 @@
       appearance: none;
       border: 0;
       background: transparent;
-      color: inherit;
+      color: var(--accent);
       font: inherit;
-      font-weight: 750;
-      padding: 2px 0;
+      font-weight: 400;
+      padding: 4px 0;
       cursor: pointer;
-      text-decoration: underline;
+      text-decoration: none;
       text-decoration-thickness: 1px;
       text-underline-offset: 3px;
-      text-decoration-color: rgba(23, 107, 135, 0.35);
+      text-decoration-color: rgba(0, 102, 204, 0.35);
     }
 
     .symbol-button:hover {
       color: var(--accent);
+      text-decoration: underline;
       text-decoration-color: var(--accent);
+    }
+
+    .symbol-button:focus-visible {
+      outline: 2px solid var(--accent-focus);
+      outline-offset: 3px;
+      border-radius: 5px;
     }
 
     .tooltip-card {
       position: fixed;
       z-index: 20;
       width: min(320px, calc(100vw - 28px));
-      padding: 14px;
+      padding: 17px;
       background: #ffffff;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: 0 18px 44px rgba(18, 28, 40, 0.18);
+      border-radius: 18px;
       display: none;
     }
 
@@ -259,18 +277,22 @@
     .tooltip-meta {
       color: var(--muted);
       font-size: 12px;
+      line-height: 1.3;
+      letter-spacing: -0.12px;
       margin-bottom: 9px;
     }
 
     .tooltip-desc {
       color: var(--ink);
-      font-size: 13px;
+      font-size: 14px;
+      line-height: 1.43;
+      letter-spacing: -0.224px;
     }
 
     .swatch {
       width: 9px;
       height: 24px;
-      border-radius: 4px;
+      border-radius: 5px;
       background: var(--accent);
       display: inline-block;
     }
@@ -279,7 +301,7 @@
       height: 7px;
       min-width: 90px;
       border-radius: 99px;
-      background: #e8edf2;
+      background: var(--line-soft);
       overflow: hidden;
     }
 
@@ -302,10 +324,10 @@
     .warning {
       display: none;
       margin: 0 0 14px;
-      padding: 12px 14px;
+      padding: 12px 17px;
       border: 1px solid #e9d89d;
       background: #fff8df;
-      border-radius: 8px;
+      border-radius: 18px;
       color: #594500;
     }
 
@@ -316,12 +338,14 @@
     .footer-note {
       color: var(--muted);
       font-size: 12px;
+      line-height: 1.3;
+      letter-spacing: -0.12px;
       margin-top: 12px;
     }
 
     @media (max-width: 900px) {
       main {
-        padding: 16px;
+        padding: 24px 16px 40px;
       }
 
       header {
@@ -348,7 +372,7 @@
       }
 
       .metric-value {
-        font-size: 24px;
+        font-size: 28px;
       }
     }
   </style>
@@ -357,7 +381,7 @@
   <main>
     <header>
       <div>
-        <h1>Live Account Dashboard</h1>
+        <h1>Fund</h1>
         <p id="subtitle" class="subhead">Loading live account snapshots...</p>
       </div>
       <div id="status" class="status-pill"></div>
@@ -434,12 +458,12 @@
 
     <div id="stock-tooltip" class="tooltip-card" role="dialog" aria-live="polite"></div>
 
-    <p class="footer-note">Data source: reports/live_account_history.json. API keys stay server-side in the Python snapshot command.</p>
+    <p class="footer-note">Data source: live account snapshots. Alpaca API keys stay server-side.</p>
   </main>
 
   <script>
     const INITIAL_SEED = 100;
-    const COLORS = ["#176b87", "#8a6f2a", "#16845b", "#8c5a22", "#b23b58", "#697586", "#3f6bb5"];
+    const COLORS = ["#0066cc", "#333333", "#7a7a7a", "#2997ff", "#1d1d1f", "#cccccc", "#e0e0e0"];
     const STOCK_INFO = {
       AAPL: {
         name: "Apple Inc.",
@@ -493,9 +517,9 @@
       }
     };
 
-    Chart.defaults.font.family = 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-    Chart.defaults.color = "#697586";
-    Chart.defaults.borderColor = "#edf1f5";
+    Chart.defaults.font.family = '"SF Pro Text", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    Chart.defaults.color = "#7a7a7a";
+    Chart.defaults.borderColor = "#f0f0f0";
 
     async function loadHistory() {
       const defaultApiBase = "https://trader-agent-api.minhaenl.workers.dev";
@@ -601,8 +625,8 @@
             {
               label: "Equity",
               data: equity,
-              borderColor: "#176b87",
-              backgroundColor: "rgba(23, 107, 135, 0.12)",
+              borderColor: "#0066cc",
+              backgroundColor: "rgba(0, 102, 204, 0.08)",
               tension: 0.35,
               fill: true,
               pointRadius: history.length > 12 ? 0 : 3,
@@ -611,7 +635,7 @@
             {
               label: "Cash",
               data: cash,
-              borderColor: "#9a6b00",
+              borderColor: "#333333",
               backgroundColor: "transparent",
               tension: 0.35,
               pointRadius: history.length > 12 ? 0 : 3,
@@ -620,7 +644,7 @@
             {
               label: "Capital Cap",
               data: cap,
-              borderColor: "#8d98a7",
+              borderColor: "#7a7a7a",
               borderDash: [5, 5],
               backgroundColor: "transparent",
               pointRadius: 0,
