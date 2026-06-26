@@ -1,0 +1,14 @@
+{
+  "name": "trader-agent",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:dashboard": "node scripts/dev-dashboard.js",
+    "dev:worker": "wrangler dev --config worker/wrangler.jsonc --local --port 8787",
+    "deploy:pages": "wrangler pages deploy public --project-name trader-agent",
+    "deploy:worker": "wrangler deploy --config worker/wrangler.jsonc"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

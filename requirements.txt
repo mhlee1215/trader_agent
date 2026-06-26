@@ -1,0 +1,6 @@
+pandas
+numpy
+vectorbt
+alpaca-py
+python-dotenv
+plotly

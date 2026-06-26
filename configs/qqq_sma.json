@@ -1,0 +1,12 @@
+{
+  "name": "qqq_sma_sweep",
+  "symbol": "QQQ",
+  "cash": 10000,
+  "data_path": "data/QQQ_daily.csv",
+  "fast_windows": [20, 50, 75, 100],
+  "slow_windows": [100, 150, 200, 250],
+  "uptrend_weight": 1.0,
+  "downtrend_weight": 0.5,
+  "fees": 0.0001,
+  "slippage": 0.0005
+}

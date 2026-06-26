@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live Account Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --panel-soft: #f9fafb;
+      --ink: #18202a;
+      --muted: #697586;
+      --line: #dde3ea;
+      --line-soft: #edf1f5;
+      --accent: #176b87;
+      --accent-soft: #e6f4f7;
+      --gold: #9a6b00;
+      --green: #16845b;
+      --red: #c24135;
+      --shadow: 0 12px 28px rgba(20, 31, 45, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, p {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: 26px;
+      line-height: 1.1;
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .subhead {
+      color: var(--muted);
+      margin-top: 7px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(22, 132, 91, 0.12);
+    }
+
+    .dot.closed {
+      background: var(--red);
+      box-shadow: 0 0 0 4px rgba(194, 65, 53, 0.12);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      min-width: 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 26px;
+      line-height: 1.1;
+      font-weight: 780;
+      white-space: nowrap;
+    }
+
+    .metric-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+      min-height: 17px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(360px, 0.9fr);
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 16px 0;
+    }
+
+    .panel-note {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .chart-wrap {
+      height: 330px;
+      padding: 12px 16px 16px;
+    }
+
+    .allocation-wrap {
+      height: 330px;
+      padding: 12px 16px 16px;
+    }
+
+    .table-panel {
+      overflow: hidden;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      padding: 6px 0 2px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 11px 16px;
+      border-top: 1px solid var(--line-soft);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--panel-soft);
+    }
+
+    td {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .symbol {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 750;
+    }
+
+    .symbol-button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-weight: 750;
+      padding: 2px 0;
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      text-decoration-color: rgba(23, 107, 135, 0.35);
+    }
+
+    .symbol-button:hover {
+      color: var(--accent);
+      text-decoration-color: var(--accent);
+    }
+
+    .tooltip-card {
+      position: fixed;
+      z-index: 20;
+      width: min(320px, calc(100vw - 28px));
+      padding: 14px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 18px 44px rgba(18, 28, 40, 0.18);
+      display: none;
+    }
+
+    .tooltip-card.show {
+      display: block;
+    }
+
+    .tooltip-title {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .tooltip-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 9px;
+    }
+
+    .tooltip-desc {
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .swatch {
+      width: 9px;
+      height: 24px;
+      border-radius: 4px;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    .bar-track {
+      height: 7px;
+      min-width: 90px;
+      border-radius: 99px;
+      background: #e8edf2;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .positive {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .negative {
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .warning {
+      display: none;
+      margin: 0 0 14px;
+      padding: 12px 14px;
+      border: 1px solid #e9d89d;
+      background: #fff8df;
+      border-radius: 8px;
+      color: #594500;
+    }
+
+    .warning.show {
+      display: block;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        padding: 16px;
+      }
+
+      header {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-wrap, .allocation-wrap {
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-value {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Live Account Dashboard</h1>
+        <p id="subtitle" class="subhead">Loading live account snapshots...</p>
+      </div>
+      <div id="status" class="status-pill"></div>
+    </header>
+
+    <div id="warning" class="warning"></div>
+
+    <section class="metrics" aria-label="Live account summary">
+      <article class="metric">
+        <div class="metric-label">Equity</div>
+        <div id="equity" class="metric-value">-</div>
+        <div id="equity-note" class="metric-note">Live account value</div>
+      </article>
+      <article class="metric">
+        <div class="metric-label">Cash</div>
+        <div id="cash" class="metric-value">-</div>
+        <div id="cash-note" class="metric-note">Available cash</div>
+      </article>
+      <article class="metric">
+        <div class="metric-label">Return</div>
+        <div id="return" class="metric-value">-</div>
+        <div class="metric-note">Against $100 starting seed</div>
+      </article>
+      <article class="metric">
+        <div class="metric-label">Cap Used</div>
+        <div id="cap-used" class="metric-value">-</div>
+        <div id="cap-note" class="metric-note">LIVE_CAPITAL_CAP</div>
+      </article>
+    </section>
+
+    <section class="layout">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Equity and Cash</h2>
+          <span id="trend-note" class="panel-note">History</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="trend"></canvas>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Current Allocation</h2>
+          <span id="allocation-note" class="panel-note">By market value</span>
+        </div>
+        <div class="allocation-wrap">
+          <canvas id="allocation"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="panel-head">
+        <h2>Positions</h2>
+        <span id="positions-note" class="panel-note">Current live holdings</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Qty</th>
+              <th>Market Value</th>
+              <th>Unrealized P/L</th>
+              <th>Weight</th>
+              <th>Allocation</th>
+            </tr>
+          </thead>
+          <tbody id="positions"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div id="stock-tooltip" class="tooltip-card" role="dialog" aria-live="polite"></div>
+
+    <p class="footer-note">Data source: reports/live_account_history.json. API keys stay server-side in the Python snapshot command.</p>
+  </main>
+
+  <script>
+    const INITIAL_SEED = 100;
+    const COLORS = ["#176b87", "#8a6f2a", "#16845b", "#8c5a22", "#b23b58", "#697586", "#3f6bb5"];
+    const STOCK_INFO = {
+      AAPL: {
+        name: "Apple Inc.",
+        sector: "Technology",
+        description: "Designs and sells iPhone, Mac, iPad, wearables, services, and related consumer hardware/software."
+      },
+      AMAT: {
+        name: "Applied Materials, Inc.",
+        sector: "Semiconductor Equipment",
+        description: "Supplies manufacturing equipment, services, and materials engineering systems used to produce chips and advanced displays."
+      },
+      AMZN: {
+        name: "Amazon.com, Inc.",
+        sector: "Consumer / Cloud",
+        description: "Operates e-commerce, logistics, advertising, subscription, and AWS cloud computing businesses."
+      },
+      AVGO: {
+        name: "Broadcom Inc.",
+        sector: "Semiconductors / Infrastructure Software",
+        description: "Provides semiconductor products and infrastructure software for networking, broadband, storage, wireless, and enterprise markets."
+      },
+      CVX: {
+        name: "Chevron Corporation",
+        sector: "Energy",
+        description: "Integrated energy company involved in oil and gas exploration, production, refining, chemicals, and fuel distribution."
+      },
+      INTC: {
+        name: "Intel Corporation",
+        sector: "Semiconductors",
+        description: "Designs and manufactures processors, data center chips, networking products, and semiconductor manufacturing technologies."
+      },
+      LRCX: {
+        name: "Lam Research Corporation",
+        sector: "Semiconductor Equipment",
+        description: "Provides wafer fabrication equipment and services for chipmakers, especially deposition, etch, and cleaning processes."
+      },
+      MSFT: {
+        name: "Microsoft Corporation",
+        sector: "Technology",
+        description: "Builds software, cloud infrastructure, enterprise services, gaming products, devices, and productivity platforms."
+      },
+      NVDA: {
+        name: "NVIDIA Corporation",
+        sector: "Semiconductors",
+        description: "Designs GPUs, accelerated computing platforms, AI chips, networking products, and related software ecosystems."
+      },
+      XOM: {
+        name: "Exxon Mobil Corporation",
+        sector: "Energy",
+        description: "Integrated oil and gas company active in exploration, production, refining, chemicals, and energy products."
+      }
+    };
+
+    Chart.defaults.font.family = 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    Chart.defaults.color = "#697586";
+    Chart.defaults.borderColor = "#edf1f5";
+
+    async function loadHistory() {
+      const apiBase = window.TRADER_AGENT_API_BASE || "";
+      const candidates = [
+        `${apiBase}/api/live-history`,
+        "live_account_history.json"
+      ];
+
+      const errors = [];
+      for (const url of candidates) {
+        try {
+          const response = await fetch(url, { cache: "no-store" });
+          if (!response.ok) throw new Error(`${url} returned HTTP ${response.status}`);
+          return response.json();
+        } catch (error) {
+          errors.push(error.message);
+        }
+      }
+
+      throw new Error(errors.join("; "));
+    }
+
+    function latest(history) {
+      return history[history.length - 1];
+    }
+
+    function money(value) {
+      return `$${Number(value || 0).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}`;
+    }
+
+    function percent(value) {
+      return `${Number(value || 0).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}%`;
+    }
+
+    function dateLabel(iso) {
+      return new Date(iso).toLocaleString(undefined, {
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function showWarning(message) {
+      const warning = document.getElementById("warning");
+      warning.textContent = message;
+      warning.classList.add("show");
+    }
+
+    function renderMetrics(history) {
+      const row = latest(history);
+      const cap = Number(row.live_capital_cap || INITIAL_SEED);
+      const equity = Number(row.equity || 0);
+      const cash = Number(row.cash || 0);
+      const accountReturn = (equity / INITIAL_SEED - 1) * 100;
+      const capUsed = cap > 0 ? Math.min(equity, cap) / cap * 100 : 0;
+
+      setText("subtitle", `${history.length} snapshot${history.length === 1 ? "" : "s"} · last updated ${dateLabel(row.timestamp)}`);
+      setText("equity", money(equity));
+      setText("cash", money(cash));
+      setText("return", percent(accountReturn));
+      setText("cap-used", percent(capUsed));
+      setText("cap-note", `${money(Math.min(equity, cap))} of ${money(cap)}`);
+      setText("trend-note", `${dateLabel(history[0].timestamp)} → ${dateLabel(row.timestamp)}`);
+      setText("allocation-note", `${row.positions.length} positions`);
+      setText("positions-note", `${money(sumPositions(row))} invested`);
+
+      const status = document.getElementById("status");
+      status.innerHTML = `<span class="dot ${row.market_is_open ? "" : "closed"}"></span>${row.market_is_open ? "Market open" : "Market closed"} · ${String(row.status).replace("AccountStatus.", "")}`;
+
+      if (row.trading_blocked || row.account_blocked || row.open_orders.length > 0) {
+        showWarning(`Attention: trading_blocked=${row.trading_blocked}, account_blocked=${row.account_blocked}, open_orders=${row.open_orders.length}`);
+      }
+    }
+
+    function sumPositions(row) {
+      return row.positions.reduce((sum, position) => sum + Number(position.market_value || 0), 0);
+    }
+
+    function renderTrend(history) {
+      const labels = history.map(row => dateLabel(row.timestamp));
+      const equity = history.map(row => Number(row.equity || 0));
+      const cash = history.map(row => Number(row.cash || 0));
+      const cap = history.map(row => Number(row.live_capital_cap || INITIAL_SEED));
+
+      new Chart(document.getElementById("trend"), {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Equity",
+              data: equity,
+              borderColor: "#176b87",
+              backgroundColor: "rgba(23, 107, 135, 0.12)",
+              tension: 0.35,
+              fill: true,
+              pointRadius: history.length > 12 ? 0 : 3,
+              borderWidth: 2.5
+            },
+            {
+              label: "Cash",
+              data: cash,
+              borderColor: "#9a6b00",
+              backgroundColor: "transparent",
+              tension: 0.35,
+              pointRadius: history.length > 12 ? 0 : 3,
+              borderWidth: 2
+            },
+            {
+              label: "Capital Cap",
+              data: cap,
+              borderColor: "#8d98a7",
+              borderDash: [5, 5],
+              backgroundColor: "transparent",
+              pointRadius: 0,
+              borderWidth: 1.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: "index" },
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { usePointStyle: true, boxWidth: 8, boxHeight: 8 }
+            },
+            tooltip: {
+              callbacks: {
+                label: context => `${context.dataset.label}: ${money(context.raw)}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 6 }
+            },
+            y: {
+              ticks: { callback: value => money(value) }
+            }
+          }
+        }
+      });
+    }
+
+    function renderAllocation(row) {
+      const positions = [...row.positions].sort((a, b) => Number(b.market_value) - Number(a.market_value));
+      const cash = Number(row.cash || 0);
+      const labels = positions.map(position => position.symbol);
+      const values = positions.map(position => Number(position.market_value || 0));
+      if (cash > 0.01) {
+        labels.push("Cash");
+        values.push(cash);
+      }
+
+      new Chart(document.getElementById("allocation"), {
+        type: "doughnut",
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: labels.map((_, index) => COLORS[index % COLORS.length]),
+            borderColor: "#ffffff",
+            borderWidth: 3,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "64%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { usePointStyle: true, boxWidth: 8, boxHeight: 8 }
+            },
+            tooltip: {
+              callbacks: {
+                label: context => {
+                  const total = values.reduce((sum, value) => sum + value, 0);
+                  const weight = total ? context.raw / total * 100 : 0;
+                  return `${context.label}: ${money(context.raw)} (${percent(weight)})`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderPositions(row) {
+      const total = Math.max(1, Number(row.equity || 0));
+      const tbody = document.getElementById("positions");
+      tbody.innerHTML = "";
+
+      [...row.positions]
+        .sort((a, b) => Number(b.market_value || 0) - Number(a.market_value || 0))
+        .forEach((position, index) => {
+          const marketValue = Number(position.market_value || 0);
+          const pl = Number(position.unrealized_pl || 0);
+          const weight = marketValue / total * 100;
+          const info = stockInfo(position.symbol);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>
+              <span class="symbol">
+                <span class="swatch" style="background:${COLORS[index % COLORS.length]}"></span>
+                <button
+                  class="symbol-button"
+                  type="button"
+                  data-symbol="${position.symbol}"
+                  aria-label="Show ${position.symbol} company information"
+                >${position.symbol}</button>
+              </span>
+            </td>
+            <td>${Number(position.qty || 0).toFixed(6)}</td>
+            <td>${money(marketValue)}</td>
+            <td class="${pl >= 0 ? "positive" : "negative"}">${money(pl)}</td>
+            <td>${percent(weight)}</td>
+            <td>
+              <div class="bar-track" aria-label="${position.symbol} allocation ${percent(weight)}">
+                <div class="bar-fill" style="width:${Math.min(100, weight).toFixed(2)}%; background:${COLORS[index % COLORS.length]}"></div>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      if (row.positions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:left;color:var(--muted);">No live positions yet.</td></tr>`;
+      }
+    }
+
+    function stockInfo(symbol) {
+      return STOCK_INFO[symbol] || {
+        name: symbol,
+        sector: "Unknown",
+        description: "No local company description has been added for this symbol yet."
+      };
+    }
+
+    function renderTooltip(symbol, anchor) {
+      const info = stockInfo(symbol);
+      const tooltip = document.getElementById("stock-tooltip");
+      tooltip.innerHTML = `
+        <div class="tooltip-title">${symbol} · ${info.name}</div>
+        <div class="tooltip-meta">${info.sector}</div>
+        <div class="tooltip-desc">${info.description}</div>
+      `;
+
+      const rect = anchor.getBoundingClientRect();
+      const left = Math.min(window.innerWidth - 334, Math.max(14, rect.left));
+      const top = Math.min(window.innerHeight - 170, rect.bottom + 8);
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${Math.max(14, top)}px`;
+      tooltip.classList.add("show");
+    }
+
+    function hideTooltip() {
+      document.getElementById("stock-tooltip").classList.remove("show");
+    }
+
+    document.addEventListener("click", event => {
+      const button = event.target.closest(".symbol-button");
+      if (button) {
+        event.stopPropagation();
+        renderTooltip(button.dataset.symbol, button);
+        return;
+      }
+      if (!event.target.closest("#stock-tooltip")) {
+        hideTooltip();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") hideTooltip();
+    });
+
+    async function init() {
+      try {
+        const history = await loadHistory();
+        if (!Array.isArray(history) || history.length === 0) {
+          throw new Error("live_account_history.json has no snapshots");
+        }
+        const row = latest(history);
+        renderMetrics(history);
+        renderTrend(history);
+        renderAllocation(row);
+        renderPositions(row);
+      } catch (error) {
+        showWarning(`Dashboard data unavailable: ${error.message}. Run "npm run dev:dashboard" locally, or deploy the Worker API with KV history.`);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
