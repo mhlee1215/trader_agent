@@ -462,7 +462,7 @@
   </main>
 
   <script>
-    const INITIAL_SEED = 100;
+    const DEFAULT_CONTRIBUTED_CASH = 100;
     const COLORS = ["#0066cc", "#333333", "#7a7a7a", "#2997ff", "#1d1d1f", "#cccccc", "#e0e0e0"];
     const STOCK_INFO = {
       AAPL: {
@@ -601,10 +601,11 @@
 
     function renderMetrics(history) {
       const row = latest(history);
-      const cap = Number(row.live_capital_cap || INITIAL_SEED);
+      const contributedCash = Number(row.live_contributed_cash || DEFAULT_CONTRIBUTED_CASH);
+      const cap = Number(row.live_capital_cap || contributedCash);
       const equity = Number(row.equity || 0);
       const cash = Number(row.cash || 0);
-      const accountReturn = (equity / INITIAL_SEED - 1) * 100;
+      const accountReturn = contributedCash > 0 ? (equity / contributedCash - 1) * 100 : 0;
       const capUsed = cap > 0 ? Math.min(equity, cap) / cap * 100 : 0;
 
       setText("subtitle", `${history.length} snapshot${history.length === 1 ? "" : "s"} · last updated ${dateLabel(row.timestamp)}`);
@@ -613,6 +614,7 @@
       setText("return", percent(accountReturn));
       setText("cap-used", percent(capUsed));
       setText("cap-note", `${money(Math.min(equity, cap))} of ${money(cap)}`);
+      document.querySelector("#return + .metric-note").textContent = `Against ${money(contributedCash)} contributed cash`;
       setText("trend-note", `${dateLabel(history[0].timestamp)} → ${dateLabel(row.timestamp)}`);
       setText("allocation-note", `${row.positions.length} positions`);
       setText("positions-note", `${money(sumPositions(row))} invested`);
@@ -633,7 +635,7 @@
       const labels = history.map(row => dateLabel(row.timestamp));
       const equity = history.map(row => Number(row.equity || 0));
       const cash = history.map(row => Number(row.cash || 0));
-      const cap = history.map(row => Number(row.live_capital_cap || INITIAL_SEED));
+      const cap = history.map(row => Number(row.live_capital_cap || row.live_contributed_cash || DEFAULT_CONTRIBUTED_CASH));
 
       new Chart(document.getElementById("trend"), {
         type: "line",

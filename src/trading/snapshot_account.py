@@ -54,6 +54,7 @@ def main() -> None:
         "cash": to_float(account.cash),
         "buying_power": to_float(account.buying_power),
         "live_capital_cap": to_float(env.get("LIVE_CAPITAL_CAP")) if args.account == "live" else None,
+        "live_contributed_cash": contributed_cash(env) if args.account == "live" else None,
         "open_orders": [
             {
                 "symbol": order.symbol,
@@ -108,6 +109,15 @@ def to_float(value) -> float:
     if value is None:
         return 0.0
     return float(value)
+
+
+def contributed_cash(env: dict[str, str]) -> float:
+    return to_float(
+        env.get("LIVE_CONTRIBUTED_CASH")
+        or env.get("LIVE_INITIAL_SEED")
+        or env.get("LIVE_CAPITAL_CAP")
+        or "100"
+    )
 
 
 if __name__ == "__main__":

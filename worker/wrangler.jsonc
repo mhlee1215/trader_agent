@@ -7,7 +7,8 @@
     "enabled": true
   },
   "vars": {
-    "LIVE_CAPITAL_CAP": "100"
+    "LIVE_CAPITAL_CAP": "600",
+    "LIVE_CONTRIBUTED_CASH": "600"
   },
   "kv_namespaces": [
     {

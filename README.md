@@ -65,4 +65,5 @@ Cloudflare KV                live_account_history storage
 - Never commit `.env`, `.env.live`, `.env.paper`, or `.dev.vars`.
 - Never put Alpaca secrets in browser-side JavaScript.
 - Live account automation is capped by `LIVE_CAPITAL_CAP`.
+- Fund return is calculated against `LIVE_CONTRIBUTED_CASH`.
 - Generated market data and runtime reports are ignored by git.

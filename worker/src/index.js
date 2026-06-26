@@ -67,6 +67,7 @@ async function readLiveSnapshot(env) {
     cash: toNumber(account.cash),
     buying_power: toNumber(account.buying_power),
     live_capital_cap: toNumber(env.LIVE_CAPITAL_CAP || "100"),
+    live_contributed_cash: toNumber(env.LIVE_CONTRIBUTED_CASH || env.LIVE_INITIAL_SEED || env.LIVE_CAPITAL_CAP || "100"),
     open_orders: orders.map(order => ({
       symbol: order.symbol,
       side: String(order.side),
