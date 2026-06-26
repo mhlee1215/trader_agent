@@ -605,20 +605,21 @@
       const cap = Number(row.live_capital_cap || contributedCash);
       const equity = Number(row.equity || 0);
       const cash = Number(row.cash || 0);
+      const invested = sumPositions(row);
       const accountReturn = contributedCash > 0 ? (equity / contributedCash - 1) * 100 : 0;
-      const capUsed = cap > 0 ? Math.min(equity, cap) / cap * 100 : 0;
+      const capUsed = cap > 0 ? invested / cap * 100 : 0;
 
       setText("subtitle", `${history.length} snapshot${history.length === 1 ? "" : "s"} · last updated ${dateLabel(row.timestamp)}`);
       setText("equity", money(equity));
       setText("cash", money(cash));
       setText("return", percent(accountReturn));
       setText("cap-used", percent(capUsed));
-      setText("cap-note", `${money(Math.min(equity, cap))} of ${money(cap)}`);
+      setText("cap-note", `${money(invested)} invested of ${money(cap)} cap`);
       const source = row.live_contributed_cash_source ? ` · ${formatContributionSource(row.live_contributed_cash_source)}` : "";
       document.querySelector("#return + .metric-note").textContent = `Against ${money(contributedCash)} contributed cash${source}`;
       setText("trend-note", `${dateLabel(history[0].timestamp)} → ${dateLabel(row.timestamp)}`);
       setText("allocation-note", `${row.positions.length} positions`);
-      setText("positions-note", `${money(sumPositions(row))} invested`);
+      setText("positions-note", `${money(invested)} invested`);
 
       const status = document.getElementById("status");
       status.innerHTML = `<span class="dot ${row.market_is_open ? "" : "closed"}"></span>${row.market_is_open ? "Market open" : "Market closed"} · ${String(row.status).replace("AccountStatus.", "")}`;
