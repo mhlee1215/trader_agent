@@ -55,7 +55,7 @@ GET /api/live-current
 
 on every page refresh, so the visible account metrics come directly from Alpaca through the Worker without exposing Alpaca keys to the browser. `GET /api/live-history` remains the stored trend history.
 
-Return is calculated against `LIVE_CONTRIBUTED_CASH`, not the trading cap. This should match the total cash deposited into the live account for this experiment.
+Return is calculated against contributed cash, not the trading cap. In production, `LIVE_CONTRIBUTED_CASH_MODE=auto` makes the Worker calculate this from Alpaca `TRANS` account activities. `LIVE_CONTRIBUTED_CASH` remains a fallback/manual override.
 
 ## Cloudflare Setup
 

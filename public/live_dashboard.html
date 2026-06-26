@@ -614,7 +614,8 @@
       setText("return", percent(accountReturn));
       setText("cap-used", percent(capUsed));
       setText("cap-note", `${money(Math.min(equity, cap))} of ${money(cap)}`);
-      document.querySelector("#return + .metric-note").textContent = `Against ${money(contributedCash)} contributed cash`;
+      const source = row.live_contributed_cash_source ? ` · ${formatContributionSource(row.live_contributed_cash_source)}` : "";
+      document.querySelector("#return + .metric-note").textContent = `Against ${money(contributedCash)} contributed cash${source}`;
       setText("trend-note", `${dateLabel(history[0].timestamp)} → ${dateLabel(row.timestamp)}`);
       setText("allocation-note", `${row.positions.length} positions`);
       setText("positions-note", `${money(sumPositions(row))} invested`);
@@ -698,6 +699,13 @@
           }
         }
       });
+    }
+
+    function formatContributionSource(source) {
+      if (source === "alpaca_activities_TRANS") return "Alpaca funding history";
+      if (source === "manual") return "manual";
+      if (source.startsWith("configured_fallback")) return "fallback";
+      return source;
     }
 
     function renderAllocation(row) {

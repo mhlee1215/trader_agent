@@ -49,11 +49,12 @@ async function appendLiveSnapshot(env) {
 }
 
 async function readLiveSnapshot(env) {
-  const [account, clock, positions, orders] = await Promise.all([
+  const [account, clock, positions, orders, contribution] = await Promise.all([
     alpacaGet(env, "/v2/account"),
     alpacaGet(env, "/v2/clock"),
     alpacaGet(env, "/v2/positions"),
-    alpacaGet(env, "/v2/orders?status=open")
+    alpacaGet(env, "/v2/orders?status=open"),
+    readContributedCash(env)
   ]);
 
   return {
@@ -67,7 +68,8 @@ async function readLiveSnapshot(env) {
     cash: toNumber(account.cash),
     buying_power: toNumber(account.buying_power),
     live_capital_cap: toNumber(env.LIVE_CAPITAL_CAP || "100"),
-    live_contributed_cash: toNumber(env.LIVE_CONTRIBUTED_CASH || env.LIVE_INITIAL_SEED || env.LIVE_CAPITAL_CAP || "100"),
+    live_contributed_cash: contribution.amount,
+    live_contributed_cash_source: contribution.source,
     open_orders: orders.map(order => ({
       symbol: order.symbol,
       side: String(order.side),
@@ -85,6 +87,48 @@ async function readLiveSnapshot(env) {
       unrealized_plpc: toNumber(position.unrealized_plpc)
       }))
   };
+}
+
+async function readContributedCash(env) {
+  const mode = String(env.LIVE_CONTRIBUTED_CASH_MODE || "auto").toLowerCase();
+  const configured = toNumber(env.LIVE_CONTRIBUTED_CASH || env.LIVE_INITIAL_SEED || env.LIVE_CAPITAL_CAP || "100");
+
+  if (mode === "manual") {
+    return { amount: configured, source: "manual" };
+  }
+
+  try {
+    const activities = await readCashActivities(env);
+    const amount = activities.reduce((sum, activity) => sum + toNumber(activity.net_amount), 0);
+    return {
+      amount: amount > 0 ? amount : configured,
+      source: amount > 0 ? "alpaca_activities_TRANS" : "configured_fallback"
+    };
+  } catch (error) {
+    return { amount: configured, source: `configured_fallback:${error.message}` };
+  }
+}
+
+async function readCashActivities(env) {
+  const activities = [];
+  let pageToken = "";
+
+  for (let page = 0; page < 20; page += 1) {
+    const params = new URLSearchParams({
+      direction: "asc",
+      page_size: "100"
+    });
+    if (pageToken) params.set("page_token", pageToken);
+
+    const batch = await alpacaGet(env, `/v2/account/activities/TRANS?${params.toString()}`);
+    if (!Array.isArray(batch) || batch.length === 0) break;
+
+    activities.push(...batch);
+    if (batch.length < 100) break;
+    pageToken = batch[batch.length - 1].id;
+  }
+
+  return activities.filter(activity => ["CSD", "CSW", "TRANS"].includes(activity.activity_type));
 }
 
 async function readHistory(env) {
