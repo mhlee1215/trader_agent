@@ -99,10 +99,10 @@ curl -X POST https://YOUR_WORKER_DOMAIN/api/snapshot \
 
 ## Schedule
 
-The Worker cron is configured as:
+The Worker snapshot cron is configured as:
 
 ```text
-0 15 * * MON
+15 21 * * MON-FRI
 ```
 
-This runs every Monday at 15:00 UTC, which is safely after US market open in both PDT and PST.
+This stores a fresh dashboard snapshot at 21:15 UTC on weekdays. It does not submit trades. The live trading automation remains weekly.
