@@ -18,6 +18,7 @@ Cloudflare Pages
 Cloudflare Worker
   worker/src/index.js
   GET /api/live-history
+  GET /api/live-current
   POST /api/snapshot
   scheduled weekly snapshot
 
@@ -45,6 +46,14 @@ The local dev server serves:
 ```text
 GET /api/live-history -> reports/live_account_history.json
 ```
+
+In production, the dashboard calls:
+
+```text
+GET /api/live-current
+```
+
+on every page refresh, so the visible account metrics come directly from Alpaca through the Worker without exposing Alpaca keys to the browser. `GET /api/live-history` remains the stored trend history.
 
 ## Cloudflare Setup
 

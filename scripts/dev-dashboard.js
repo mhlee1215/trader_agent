@@ -30,6 +30,12 @@ createServer(async (request, response) => {
       return response.end(history);
     }
 
+    if (url.pathname === "/api/live-current") {
+      const history = JSON.parse(await readFile(join(reportsDir, "live_account_history.json"), "utf8"));
+      const current = Array.isArray(history) && history.length > 0 ? history[history.length - 1] : {};
+      return sendJson(response, current);
+    }
+
     const requested = url.pathname === "/" ? "/index.html" : url.pathname;
     const path = normalize(join(publicDir, requested));
     if (!path.startsWith(publicDir)) {

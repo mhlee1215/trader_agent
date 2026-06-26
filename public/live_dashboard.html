@@ -525,6 +525,7 @@
       const defaultApiBase = "https://trader-agent-api.minhaenl.workers.dev";
       const isLocal = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
       const apiBase = window.TRADER_AGENT_API_BASE || (isLocal ? "" : defaultApiBase);
+      const current = await loadCurrentSnapshot(apiBase);
       const candidates = [
         `${apiBase}/api/live-history`,
         "live_account_history.json"
@@ -535,13 +536,30 @@
         try {
           const response = await fetch(url, { cache: "no-store" });
           if (!response.ok) throw new Error(`${url} returned HTTP ${response.status}`);
-          return response.json();
+          const history = await response.json();
+          return mergeCurrentSnapshot(history, current);
         } catch (error) {
           errors.push(error.message);
         }
       }
 
       throw new Error(errors.join("; "));
+    }
+
+    async function loadCurrentSnapshot(apiBase) {
+      const response = await fetch(`${apiBase}/api/live-current`, { cache: "no-store" });
+      if (!response.ok) throw new Error(`/api/live-current returned HTTP ${response.status}`);
+      return response.json();
+    }
+
+    function mergeCurrentSnapshot(history, current) {
+      const rows = Array.isArray(history) ? [...history] : [];
+      if (!current || !current.timestamp) return rows;
+
+      const latestRow = rows[rows.length - 1];
+      if (latestRow && latestRow.timestamp === current.timestamp) return rows;
+      rows.push({ ...current, live: true });
+      return rows;
     }
 
     function latest(history) {

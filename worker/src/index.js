@@ -21,6 +21,10 @@ export default {
       return json(await readHistory(env));
     }
 
+    if (url.pathname === "/api/live-current" && request.method === "GET") {
+      return json(await readLiveSnapshot(env));
+    }
+
     if (url.pathname === "/api/snapshot" && request.method === "POST") {
       const unauthorized = unauthorizedResponse(request, env);
       if (unauthorized) return unauthorized;
@@ -37,6 +41,14 @@ export default {
 };
 
 async function appendLiveSnapshot(env) {
+  const snapshot = await readLiveSnapshot(env);
+  const history = await readHistory(env);
+  history.push(snapshot);
+  await env.TRADER_AGENT_KV.put(HISTORY_KEY, JSON.stringify(history, null, 2));
+  return snapshot;
+}
+
+async function readLiveSnapshot(env) {
   const [account, clock, positions, orders] = await Promise.all([
     alpacaGet(env, "/v2/account"),
     alpacaGet(env, "/v2/clock"),
@@ -44,7 +56,7 @@ async function appendLiveSnapshot(env) {
     alpacaGet(env, "/v2/orders?status=open")
   ]);
 
-  const snapshot = {
+  return {
     timestamp: new Date().toISOString(),
     account: "live",
     status: account.status,
@@ -70,13 +82,8 @@ async function appendLiveSnapshot(env) {
       cost_basis: toNumber(position.cost_basis),
       unrealized_pl: toNumber(position.unrealized_pl),
       unrealized_plpc: toNumber(position.unrealized_plpc)
-    }))
+      }))
   };
-
-  const history = await readHistory(env);
-  history.push(snapshot);
-  await env.TRADER_AGENT_KV.put(HISTORY_KEY, JSON.stringify(history, null, 2));
-  return snapshot;
 }
 
 async function readHistory(env) {
