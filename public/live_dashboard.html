@@ -186,6 +186,30 @@
       overflow: hidden;
     }
 
+    .policy {
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .policy p {
+      color: var(--muted-strong);
+      margin-top: 10px;
+      max-width: 780px;
+    }
+
+    details.panel {
+      margin-top: 20px;
+    }
+
+    summary {
+      cursor: pointer;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
     .table-wrap {
       overflow: auto;
       padding: 8px 0 4px;
@@ -434,6 +458,11 @@
       </article>
     </section>
 
+    <section class="panel policy">
+      <h2>Current Policy</h2>
+      <p>Weekly large-cap momentum: hold the top five names with the strongest recent 63-trading-day trend, sized inside the live capital cap. These holdings are here because the latest rebalance ranked them highest in that rule; cash is unused capacity.</p>
+    </section>
+
     <section class="panel table-panel">
       <div class="panel-head">
         <h2>Positions</h2>
@@ -455,6 +484,28 @@
         </table>
       </div>
     </section>
+
+    <details class="panel table-panel">
+      <summary class="panel-head">
+        <h2>Trade History</h2>
+        <span id="trades-note" class="panel-note">Recent filled orders</span>
+      </summary>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Symbol</th>
+              <th>Side</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody id="trades"></tbody>
+        </table>
+      </div>
+    </details>
 
     <div id="stock-tooltip" class="tooltip-card" role="dialog" aria-live="polite"></div>
 
@@ -797,6 +848,26 @@
       }
     }
 
+    function renderTrades(row) {
+      const trades = row.recent_trades || [];
+      const tbody = document.getElementById("trades");
+      setText("trades-note", `${trades.length} recent fills`);
+      tbody.innerHTML = trades.length ? "" : `<tr><td colspan="6" style="text-align:left;color:var(--muted);">No recent fills found.</td></tr>`;
+
+      trades.forEach(trade => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${dateLabel(trade.transaction_time)}</td>
+          <td>${trade.symbol || "-"}</td>
+          <td>${trade.side || "-"}</td>
+          <td>${Number(trade.qty || 0).toFixed(6)}</td>
+          <td>${money(trade.price)}</td>
+          <td>${money(trade.value)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
     function stockInfo(symbol) {
       return STOCK_INFO[symbol] || {
         name: symbol,
@@ -853,6 +924,7 @@
         renderTrend(history);
         renderAllocation(row);
         renderPositions(row);
+        renderTrades(row);
       } catch (error) {
         showWarning(`Dashboard data unavailable: ${error.message}. Run "npm run dev:dashboard" locally, or deploy the Worker API with KV history.`);
       }
